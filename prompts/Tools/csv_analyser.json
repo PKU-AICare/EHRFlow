@@ -1,0 +1,10 @@
+{
+    "_type": "prompt",
+    "input_variables": [
+      "filename",
+      "columns",
+      "inspections",
+      "query"
+    ],
+    "template_path": "csv_analyser.txt"
+}

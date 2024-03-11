@@ -1,0 +1,21 @@
+{
+    "_type":"prompt",
+    "input_variables":[
+        "instructions",
+        "input",
+        "history_info",
+        "previous_step",
+        "current_step",
+        "work_dir",
+        "constraints",
+        "tools",
+        "resources",
+        "knowledge",
+        "performance_evaluations",
+        "long_term_memory",
+        "short_term_memory",
+        "thought_instructions",
+        "format_instructions"
+    ],
+    "template_path":"executor.txt"
+}

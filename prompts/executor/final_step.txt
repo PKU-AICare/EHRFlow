@@ -1,0 +1,9 @@
+你的任务是:
+{task_description}
+
+之前任务的一些历史记录：
+{history_info}
+经过以下的思考过程，你已经完成任务:
+{short_term_memory}
+
+现在请详细给出你的最终答案:
