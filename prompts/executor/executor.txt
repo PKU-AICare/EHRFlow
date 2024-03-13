@@ -22,7 +22,7 @@ dir_path={work_dir}
 {resources}
 
 你需要了解的医学常识：
-{knowledge}
+{med_knowledge}
 
 你需要评估你的表现：
 {performance_evaluation}

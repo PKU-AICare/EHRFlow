@@ -2,7 +2,7 @@ import openai
 import os
 
 from Tools import *
-from Tools.PythonTool import CSVAnalyser
+from Tools.PythonTool import xiaoyaAnalyser
 
 from GraceAgent import (
     GraceExecutor,
@@ -41,12 +41,12 @@ def main():
         directory_inspection_tool,
         CSV_inspection_tool,
         finish_placeholder,
-        CSVAnalyser(
+        xiaoyaAnalyser(
             prompt_path="./prompts/Tools",
-            prompt_file="csv_analyser.json"
+            info_path="./Tools/xiaoya_info"
         ).as_tool()
     ]
-    model = ChatOpenAI(model='gpt-4-turbo-preview', temperature=0)
+    model = ChatOpenAI(model='gpt-4-turbo-preview', temperature=0,model_kwargs={"seed": 42})
     planner = GracePlanner(model, tools, stop=['<END_OF_PLAN>'])
     executor = GraceExecutor(
         llm=model,

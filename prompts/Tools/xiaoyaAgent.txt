@@ -12,13 +12,18 @@ print("我需要知道____的值，才能生成代码。请完善你的查询。
 否则，生成一段Python代码，分析指定文件的内容。
 
 你可以使用的库只包括：Pandas, re, math, datetime, openpyxl, matplotlib, seaborn, numpy, sklearn
+还有 xiaoya 相关的 类与函数，对应的类与函数的描述如下：
+{code_description}
+请尽量使用 xiaoya 中的类与函数来进行操作，如果其中的功能无法满足再考虑使用其他的库。
 确保你的代码只使用上述库，否则你的代码将无法运行。
 
 给定文件为：
 {filename}
 
-文件内容样例：
-{inspections}
+你之前写出的代码:
+{code}
+一些对这些代码提出的修改意见：
+{review_opinions}
 
 你输出的Python代码前后必须有markdown标识符，如下所示：
 ```python

@@ -1,0 +1,9 @@
+{
+    "_type": "prompt",
+    "input_variables": [
+      "code",
+      "format_instructions",
+      "query"
+    ],
+    "template_path": "code_reviewer.txt"
+}

@@ -1,0 +1,14 @@
+{
+    "_type": "prompt",
+    "input_variables": [
+      "filename",
+      "columns",
+      "code_description",
+      "inspections",
+      "query",
+      "code",
+      "review_opinions"
+
+    ],
+    "template_path": "xiaoyaAgent.txt"
+}
