@@ -43,7 +43,7 @@ class PythonCodeParser(BaseOutputParser):
 
 
 class xiaoyaAnalyser:
-    def __init__(self, prompt_path, info_path, verbose=True):
+    def __init__(self, prompt_path, info_path, interpreter, verbose=True):
         self.prompt_code = PromptTemplateBuilder(prompt_path, "xiaoyaAgent.json").build()
         self.prompt_review = PromptTemplateBuilder(prompt_path, "code_reviewer.json")
         self.info = {}
@@ -55,6 +55,8 @@ class xiaoyaAnalyser:
                     content = file.read()
                     self.info[key] = content
         self.info['其他'] = ""
+        self.interpreter = interpreter
+        self.code_history = []
         self.verbose = verbose
 
     def analyse(self, inputs):
@@ -69,11 +71,12 @@ class xiaoyaAnalyser:
         passParser = PydanticOutputParser(pydantic_object=PassAction)
 
         code = ""
-        res = {"type": False, "content": ""}
+        res = PassAction(type=False, content="")
 
-        while not res['type']:
+        while not res.type:
             prompt_code_new = self.prompt_code.partial(code_description=self.info[code_type], code=code,
-                                                       review_opinions=res['content'])
+                                                       review_opinions=res.content, code_history=str(self.code_history)
+                                                       )
             chain_code = prompt_code_new | llm | PythonCodeParser()
 
             if self.verbose:
@@ -89,9 +92,11 @@ class xiaoyaAnalyser:
             prompt_review_new = self.prompt_review.build(output_parser=passParser)
             chain_review = prompt_review_new | llm | passParser
             res = chain_review.invoke({"query": inputs['content'], "code": code})
+            print(res)
 
         if code:
-            ans = PythonREPLTool().run(code)
+            ans = self.interpreter.execute(code)
+            self.code_history.append((code, ans))
             return ans
         else:
             return "没有找到可执行的 Python 代码"
@@ -101,9 +106,14 @@ class xiaoyaAnalyser:
             func=self.analyse,
             name="AnalyseCSV",
             description="""通过程序脚本分析一个结构化文件（例如CSV文件）的内容。输入必须是以字典的形式进行指明,其中包含三个键： type、files和content。
-            type:只能是(数据预处理、数据分析、数据可视化、其他)其中一项
+            type:只能是(数据预处理、模型预测、数据分析、数据可视化、其他)其中一项
             files:文件的完整路径,可以是多个文件
             content:尽可能完整的阐述当前分析阶段、具体分析方式和分析依据，阈值常量等。
             如果输入信息不完整，你可以拒绝回答。"""
 
         )
+
+if __name__ == "__main__":
+    a = PassAction(type=True,
+               content='代码没有包含有害信息，语法正确，依赖项满足，函数和方法被正确调用。代码结构清晰，风格一致，命名规范，注释充分。代码处理了可能出现的异常情况和错误，确保了代码的稳定性和可靠性。代码完美解决了用户的需求，进行了数据清洗、数据格式标准化、缺失值处理和异常值处理。')
+    print(a.type)

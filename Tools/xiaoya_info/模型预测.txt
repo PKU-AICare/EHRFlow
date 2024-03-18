@@ -1,0 +1,54 @@
+`Pipeline`类是一个用于医疗数据分析的深度学习类，支持多种模型和任务配置。它简化了从数据加载到模型训练、评估和结果保存的整个流程，适用于预测患者健康结果和优化模型性能。
+
+### 类名：`Pipeline`
+
+#### 构造函数 (`__init__`):
+- **功能**: 初始化`Pipeline`类的实例，设置模型训练和预测所需的配置。
+- **参数**:
+  - `model`: 字符串，指定使用的模型类型，可选值包括'LSTM'、'GRU'、'AdaCare'、'ConCare'、'RNN'、'MLP'。默认值是'GRU'。
+  - `task`: 字符串，指定任务类型，可选值包括'multitask'、'outcome'、'los'。默认值是'multitask'。
+  - `batch_size`: 整数，指定批处理大小，默认值是64。
+  - `learning_rate`: 浮点数，指定学习率，默认值是0.001。
+  - `hidden_dim`: 整数，指定隐藏层的维度，默认值是32。
+  - `epochs`: 整数，指定训练的轮数，默认值是50。
+  - `patience`: 整数，指定早停法的耐心值，默认值是10。
+  - `seed`: 整数，用于随机数生成的种子，默认值是42。
+  - `data_path`: `Path`对象，指定数据存放的路径，默认值是`Path('./datasets')`。
+  - `demographic_dim`: 整数，指定人口统计特征的维度，默认值是2。
+  - `labtest_dim`: 整数，指定实验室测试特征的维度，默认值是73。
+
+#### 方法：
+
+1. `train`:
+   - **功能**: 根据配置训练模型，并保存检查点。
+   - **参数**:
+     - `ckpt_path`: 字符串，指定保存检查点的路径，默认值是'./checkpoints'。
+     - `ckpt_name`: 字符串，指定检查点文件的名称，默认值是'best'。
+
+2. `predict`:
+   - **功能**: 使用最佳模型进行预测，并将度量结果保存起来。
+   - **参数**:
+     - `model_path`: 字符串，指定最佳模型的路径。（无默认值）
+     - `metric_path`: 字符串，指定保存度量结果的路径，默认值是'./metrics'。
+   - **返回值**: 一个字典，包含预测结果、标签、配置和性能指标。
+
+3. `execute`:
+   - **功能**: 执行整个管道，如果`model_path`为`None`，则先训练模型，否则直接进行预测。
+   - **参数**:
+     - `model_path`: 字符串，可选参数，指定模型的路径。默认值为`None`。
+   - **返回值**: 一个字典，包含预测的详细信息。
+
+通过这些描述，大模型应该能够理解如何使用`Pipeline`类来设置、训练和预测医疗相关的模型，以及如何保存和处理训练过程中的检查点和度量结果。
+
+#### 使用范例：
+
+进行 concare 模型的预测
+```python
+from xiaoya.pipeline import Pipeline
+from xiaoya.analysis import DataAnalyzer
+from xiaoya.plot import plot_feature_importance
+
+#使用 Concare 这个 模型进行训练和预测
+pl = Pipeline(model='ConCare')
+pl.execute()
+```

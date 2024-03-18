@@ -20,10 +20,8 @@ print("我需要知道____的值，才能生成代码。请完善你的查询。
 给定文件为：
 {filename}
 
-你之前写出的代码:
-{code}
-一些对这些代码提出的修改意见：
-{review_opinions}
+你之前生成的并且被成功执行的代码以及执行结果，你在生成新的代码的时候可以使用其中已经被定义的类、变量等：
+{code_history}
 
 你输出的Python代码前后必须有markdown标识符，如下所示：
 ```python
@@ -38,3 +36,8 @@ print('hello world')
 
 用户输入：
 {query}
+
+这是你针对用户输入写出的代码:
+{code}
+一些对这些代码提出的修改意见：
+{review_opinions}

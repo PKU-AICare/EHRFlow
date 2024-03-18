@@ -32,24 +32,33 @@ class PlanningOutputParser(PlanOutputParser):
 class GracePlanner:
     """LLM planner."""
 
-    def __init__(self, llm: BaseLanguageModel,tools, output_parser: PlanOutputParser = PlanningOutputParser(),
+    def __init__(self, llm: BaseLanguageModel, tools, output_parser: PlanOutputParser = PlanningOutputParser(),
                  stop: Optional[List] = None):
-        self.prompt = None
         self.llm = llm
-        self.prompt_template = PromptTemplateBuilder(prompt_path="./prompts/planner",
-                                                     prompt_file="planner.json").build(
-            tools=tools
-        ).partial(
-        )
+        self.prompt_plan_template = PromptTemplateBuilder(prompt_path="./prompts/planner",
+                                                          prompt_file="planner.json").build(
+        ).partial(tool=str([(tool.name, tool.description) for tool in tools]))
+        self.prompt_refine_template = PromptTemplateBuilder(prompt_path="./prompts/planner",
+                                                            prompt_file="planner_refine.json").build(
+        ).partial(tool=str([(tool.name, tool.description) for tool in tools]))
         self.output_parser = output_parser
         self.stop = stop
 
     def plan(self, inputs: dict, **kwargs: Any) -> Plan:
         """Given input, decide what to do."""
-        self.prompt = self.prompt_template.partial(previous_steps=inputs['previous_steps'] if 'previous_steps' in inputs else "", plan=inputs['plan'] if 'plan' in inputs else "")
-        llm_chain = LLMChain(llm=self.llm, prompt=self.prompt)
+        prompt_plan = self.prompt_plan_template.partial(
+            previous_steps=inputs['previous_steps'] if 'previous_steps' in inputs else "",)
+        llm_chain = LLMChain(llm=self.llm, prompt=prompt_plan)
         llm_response = llm_chain.invoke(**inputs, stop=self.stop)
         plan = self.output_parser.parse(llm_response['text'])
         return plan
 
-
+    def refine_plan(self, inputs: dict, **kwargs: Any) -> Plan:
+        # finished_plan = [item[0].value for item in inputs['previous_steps']] if 'previous_steps' in inputs else ""
+        prompt_refine = self.prompt_refine_template.partial(
+            previous_steps=inputs['previous_steps'] if 'previous_steps' in inputs else "",
+            plan=inputs['plan'] if 'plan' in inputs else "")
+        llm_chain = LLMChain(llm=self.llm, prompt=prompt_refine)
+        llm_response = llm_chain.invoke(**inputs, stop=self.stop)
+        plan = self.output_parser.parse(llm_response['text'])
+        return plan

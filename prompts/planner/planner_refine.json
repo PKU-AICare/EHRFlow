@@ -1,0 +1,16 @@
+{
+    "_type":"prompt",
+    "input_variables":[
+        "plan_constraints",
+        "input",
+        "tool",
+        "resources",
+        "previous_steps",
+        "plan_thought_instructions",
+        "plan_instructions",
+        "med_knowledge",
+        "plan_refine",
+        "plan"
+    ],
+    "template_path":"planner_refine.txt"
+}

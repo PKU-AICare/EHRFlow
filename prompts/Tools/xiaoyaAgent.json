@@ -7,7 +7,8 @@
       "inspections",
       "query",
       "code",
-      "review_opinions"
+      "review_opinions",
+      "code_history"
 
     ],
     "template_path": "xiaoyaAgent.txt"

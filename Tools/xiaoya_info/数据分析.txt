@@ -1,62 +1,119 @@
-这个`DataAnalyzer`类是一个用于分析医疗数据并提供多种分析结果的工具。888
-`DataAnalyzer`类适用于医疗数据分析场景，特别是在处理电子病历记录（EMR）时，可以用于识别患者的风险、提供个性化的医疗建议、减少数据维度以便可视化和分析，以及找到具有相似病情的患者群体。
+这个`DataAnalyzer`类是一个用于分析医疗数据并提供多种分析结果的工具。
+`DataAnalyzer`类适用于医疗数据分析场景，在执行完模型预测之后，执行医疗数据分析任务，包括计算特征重要性、生成风险曲线、提供AI建议、执行数据降维、查找相似患者和分析数据集。
 
-### 类名
-- `DataAnalyzer`
+### 类名：`DataAnalyzer`
+  - 使用： from xiaoya.analysis import DataAnalyzer
 
-### 构造函数 (`__init__`)
+#### 构造函数 (`__init__`):
 - **参数**:
-  - `config`: 一个字典（`Dict`），包含数据管道的配置信息。
-  - `model_path`: 一个字符串（`str`），表示模型保存的路径。
+  - `config`: 一个字典，包含数据管道的配置信息。
+  - `model_path`: 一个字符串，表示模型保存的路径。
+- 使用：
+    在使用之前需要使用相应的模型进行预测，之后才能初始化这个类进行后续的操作。
 
-### 方法
-- `adaptive_feature_importance`
-  - **功能**: 计算并返回患者的自适应特征重要性。
-  - **参数**:
-    - `df`: 一个`pd.DataFrame`，代表患者的原始数据。
-    - `x`: 一个列表（`List`），形状为`[batch_size, time_step, feature_dim]`，代表患者的输入数据。
-    - `patient_index`: 一个可选的整数（`Optional[int]`），代表数据帧中患者的索引。
-    - `patient_id`: 一个可选的整数（`Optional[int]`），代表数据帧中记录的患者ID。`patient_index`和`patient_id`只能选择其一。
-  - **返回值**: 一个字典，包含自适应特征重要性的详细信息。
+#### 方法：
 
-- `feature_importance`
-  - **功能**: 计算并返回患者的特征重要性。
-  - **参数**: 与`adaptive_feature_importance`方法相同。
-  - **返回值**: 一个列表，包含特征重要性的详细信息。
+1. `adaptive_feature_importance`:
+   - **功能**: 计算并返回患者的自适应特征重要性。
+   - **参数**:
+     - `df`: 一个`pandas` DataFrame，包含患者的原始数据。一般是数据预处理之后的'datasets/train_raw.csv'
+     - `x`: 一个列表，形状为[batch_size, time_step, feature_dim]，代表患者的输入数据。一般是数据预处理之后的'datasets/train_x.pkl'
+     - `patient_index`: 一个可选的整数，代表数据帧中患者的索引,一般输入 0。
+     - `patient_id`: 一个可选的整数，代表数据帧中记录的患者ID。`patient_index`和`patient_id`只能选择其一。
+   - **返回值**: 一个字典，包含患者自适应特征重要性的列表，形状为[time_step, feature_dim]。
 
-- `risk_curve`
-  - **功能**: 计算并返回患者的风险曲线，以及每次就诊时患者的特征重要性。
-  - **参数**:
-    - 与`adaptive_feature_importance`方法相同，额外包含`mean`和`std`字典，以及可选的`mask`列表。
-  - **返回值**: 包含特征详细信息、就诊日期和患者每次就诊的死亡风险的列表。
+2. `feature_importance`:
+   - **功能**: 返回患者的特征重要性信息。
+   - **参数**:
+     - `df`: 一个`pandas` DataFrame，包含患者的原始数据。一般是数据预处理之后的'datasets/train_raw.csv'
+     - `x`: 一个列表，形状为[batch_size, time_step, feature_dim]，代表患者的输入数据。一般是数据预处理之后的'datasets/train_x.pkl'
+     - `patient_index`: 一个可选的整数，代表数据帧中患者的索引,一般输入 0。
+     - `patient_id`: 一个可选的整数，代表数据帧中记录的患者ID。`patient_index`和`patient_id`只能选择其一。
+   - **返回值**: 一个列表，包含字典项，每个字典项包含特征名称、特征重要性值和自适应特征重要性值。
 
-- `ai_advice`
-  - **功能**: 根据AI系统的分析，返回给患者的建议。
-  - **参数**:
-    - 与`adaptive_feature_importance`方法相同，额外包含`mean`和`std`字典，以及`time_index`整数。
-  - **返回值**: 一个列表，包含AI系统建议的详细信息。
+3. `risk_curve`:
+   - **功能**: 计算并返回患者的风险曲线，以及每次就诊的特征重要性。
+   - **参数**:
+     - `df`: 一个`pandas` DataFrame，包含患者的原始数据。一般是数据预处理之后的'datasets/train_raw.csv'
+     - `x`: 一个列表，形状为[batch_size, time_step, feature_dim]，代表患者的输入数据。一般是数据预处理之后的'datasets/train_x.pkl'
+     - `mean`: 一个字典，包含所有特征的平均值。
+     - `std`: 一个字典，包含所有特征的标准差。
+     - `mask`: 一个可选的列表，形状为[batch_size, time_step, feature_dim]，代表患者原始数据的缺失状态。
+     - `patient_index`: 一个可选的整数，代表数据帧中患者的索引,一般输入 0。
+     - `patient_id`: 一个可选的整数，代表数据帧中记录的患者ID。`patient_index`和`patient_id`只能选择其一。
+   - **返回值**: 三个列表，分别包含特征详细信息、患者就诊日期和每次就诊的患者死亡风险。
 
-- `data_dimension_reduction`
-  - **功能**: 通过降维方法（如PCA或TSNE）减少患者数据的维度。
-  - **参数**:
-    - `df`: 一个`pd.DataFrame`，代表患者的原始数据。
-    - `x`: 一个列表（`List`），形状为`[batch_size, time_step, feature_dim]`，代表患者的输入数据。
-    - `mean_age`和`std_age`: 可选的浮点数（`Optional[float]`），代表患者的平均年龄和标准差。
-    - `method`: 一个字符串（`str`），表示降维方法，默认为"PCA"。
-    - `dimension`: 一个整数（`int`），表示降维后的目标维度，默认为2。
-    - `target`: 一个字符串（`str`），表示模型的目标，默认为"outcome"。
-  - **返回值**: 一个列表，包含降维后患者数据的详细信息。
+4. `ai_advice`:
+   - **功能**: 返回AI系统的建议。
+   - **参数**:
+     - `df`: 一个`pandas` DataFrame，包含患者的原始数据。一般是数据预处理之后的'datasets/train_raw.csv'
+     - `x`: 一个列表，形状为[batch_size, time_step, feature_dim]，代表患者的输入数据。一般是数据预处理之后的'datasets/train_x.pkl'
+     - `mean`: 一个字典，包含所有特征的平均值。
+     - `std`: 一个字典，包含所有特征的标准差。
+     - `patient_index`: 一个可选的整数，代表数据帧中患者的索引。
+     - `patient_id`: 一个可选的整数，代表数据帧中记录的患者ID。`patient_index`和`patient_id`只能选择其一,一般输入 0。
+     - `time_index`: 一个整数，代表患者就诊的索引，默认值为-1。
+   - **返回值**: 一个列表，包含字典项，每个字典项代表AI系统针对特定特征的建议，包括特征名称、旧值和新值。
 
-- `similar_patients`
-  - **功能**: 找到与给定患者相似的患者信息。
-  - **参数**:
-    - `x_df`: 一个`pd.DataFrame`，代表患者的原始数据。
-    - `x`: 一个列表（`List`），形状为`[batch_size, time_step, feature_dim]`，代表患者的输入数据。
-    - `p_df`: 一个`pd.DataFrame`，代表相似患者的原始数据。
-    - `patients`: 一个列表（`List`），形状与`x`相同，代表相似患者的输入数据。
-    - `mean`和`std`: 与前面方法相同的字典。
-    - `patient_index`和`patient_id`: 与前面方法相同的可选整数。
-    - `n_clu`: 一个整数（`int`），表示聚类的数量，默认为10。
-    - `topk`: 一个整数（`int`），表示返回的相似患者数量，默认为6。
-  - **返回值**: 一个列表，包含相似患者信息的详细信息。
+5. `data_dimension_reduction`:
+   - **功能**: 通过降维方法（如PCA或TSNE）减少患者数据的维度。
+   - **参数**:
+     - `df`: 一个`pandas` DataFrame，包含患者的原始数据。一般是数据预处理之后的'datasets/train_raw.csv'
+     - `x`: 一个列表，形状为[batch_size, time_step, feature_dim]，代表患者的输入数据。一般是数据预处理之后的'datasets/train_x.pkl'
+     - `mean_age`: 一个可选的浮点数，代表患者平均年龄。
+     - `std_age`: 一个可选的浮点数，代表患者年龄的标准差。
+     - `method`: 一个字符串，代表降维方法，默认值为"PCA"。
+     - `dimension`: 一个整数，代表降维后的目标维度，默认值为2。
+     - `target`: 一个字符串，代表模型的目标，默认值为"outcome"。
+   - **返回值**: 一个列表，包含字典项，每个字典项包含降维后的患者数据、患者ID和就诊时间。
+
+6. `similar_patients`:
+   - **功能**: 返回与给定患者相似的患者信息。
+   - **参数**:
+     - `df`: 一个`pandas` DataFrame，包含患者的原始数据。一般是数据预处理之后的'datasets/train_raw.csv'
+     - `x`: 一个列表，形状为[batch_size, time_step, feature_dim]，代表患者的输入数据。一般是数据预处理之后的'datasets/train_x.pkl'
+     - `mean`: 一个字典，包含所有特征的平均值。
+     - `std`: 一个字典，包含所有特征的标准差。
+     - `patient_index`: 一个可选的整数，代表数据帧中患者的索引。
+     - `patient_id`: 一个可选的整数，代表数据帧中记录的患者ID。`patient_index`和`patient_id`只能选择其一,一般输入 0。
+     - `n_clu`: 一个整数，代表聚类的数量，默认值为10。
+     - `topk`: 一个整数，代表相似患者的数量，默认值为6。
+   - **返回值**: 一个列表，包含字典项，每个字典项代表一个相似患者的信息，包括患者ID、上下文信息、与患者的距离和相似度。
+
+7. `analyze_dataset`:
+   - **功能**: 分析数据集，返回不同维度下的数据分布。
+   - **参数**:
+     - `df`: 一个`pandas` DataFrame，包含患者的原始数据。一般是数据预处理之后的'datasets/train_raw.csv'
+     - `x`: 一个列表，形状为[batch_size, time_step, feature_dim]，代表患者的输入数据。一般是数据预处理之后的'datasets/train_x.pkl'
+     - `feature`: 一个字符串，代表要分析的特征名称。
+     - `mean`: 一个字典，包含所有特征的平均值。
+     - `std`: 一个字典，包含所有特征的标准差。
+   - **返回值**: 三个列表，包含二维和三维数据的切分信息以及患者的结果。
+
+### 使用示例：
+下面这些示例能够帮助你更好的理解对应代码的使用：
+Plot Feature Importance histogram
+``` python
+import pandas as pd
+
+from xiaoya.pipeline import Pipeline
+from xiaoya.analysis import DataAnalyzer
+from xiaoya.plot import plot_feature_importance
+
+# 使用 Concare 这个模型进行训练和预测
+pl = Pipeline(model='ConCare')
+pl.execute()
+
+# 之后才能进行相应的分析
+data_analyzer = DataAnalyzer(pl.config, pl.model_path)
+train_raw = pd.read_csv('datasets/train_raw.csv')
+train_x = pd.read_pickle('datasets/train_x.pkl')
+result = data_analyzer.feature_importance(
+    df=train_raw,
+    x=train_x,
+    patient_index=0
+)
+# 得到分析结果后之后才能进行相应的可视化
+plot_feature_importance(result, save_path='./output/')
+```
 

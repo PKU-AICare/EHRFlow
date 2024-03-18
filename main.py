@@ -12,8 +12,10 @@ from GraceAgent import (
 from Tools import *
 from langchain_openai import ChatOpenAI, OpenAI
 from dotenv import load_dotenv, find_dotenv
+from Tools.Interpreter import Interpreter
 
 import warnings
+
 warnings.filterwarnings("ignore")
 
 _ = load_dotenv(find_dotenv())
@@ -36,6 +38,7 @@ def launch_agent(agent):
 
 
 def main():
+    interpreter = Interpreter()
     tools = [
         document_generation_tool,
         directory_inspection_tool,
@@ -43,10 +46,11 @@ def main():
         finish_placeholder,
         xiaoyaAnalyser(
             prompt_path="./prompts/Tools",
-            info_path="./Tools/xiaoya_info"
+            info_path="./Tools/xiaoya_info",
+            interpreter=interpreter
         ).as_tool()
     ]
-    model = ChatOpenAI(model='gpt-4-turbo-preview', temperature=0,model_kwargs={"seed": 42})
+    model = ChatOpenAI(model='gpt-4-turbo-preview', temperature=0, model_kwargs={"seed": 42})
     planner = GracePlanner(model, tools, stop=['<END_OF_PLAN>'])
     executor = GraceExecutor(
         llm=model,

@@ -9,11 +9,10 @@ from Utils.PrintUtils import *
 from Utils.PromptTemplateBuilder import PromptTemplateBuilder
 
 from langchain_experimental.plan_and_execute.executors.base import BaseExecutor
-from langchain_experimental.plan_and_execute.schema import (
-    BaseStepContainer,
-    ListStepContainer,
-)
+from langchain_experimental.plan_and_execute.schema import BaseStepContainer
+from Utils.ListStepContainerNew import ListStepContainer
 from langchain_experimental.pydantic_v1 import Field
+from langchain_experimental.plan_and_execute.schema import Plan
 
 
 class GraceGPT(Chain):
@@ -64,9 +63,10 @@ class GraceGPT(Chain):
             )
             color_print(response, color=CODE_COLOR)
             self.step_container.add_step(step, response)
-            re_plan_inputs = {"previous_steps": self.step_container.get_steps(), "plan": plan_str, **inputs}
+            re_plan_inputs = {"previous_steps": self.step_container.get_steps(), "plan": plan, **inputs}
             #  结合执行结果，更新 plan
-            plan = self.planner.plan(re_plan_inputs)
+            new_plan = self.planner.refine_plan(re_plan_inputs)
+            plan = Plan(steps=plan.steps[:step_index + 1] + new_plan.steps)
             # print(plan)
         return {self.output_key: self.step_container.get_final_response()}
 
