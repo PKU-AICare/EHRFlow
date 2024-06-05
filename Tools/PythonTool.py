@@ -2,6 +2,7 @@ import re
 from langchain.tools import StructuredTool
 from langchain_core.output_parsers import BaseOutputParser
 
+from Tools.CSVTool import get_first_n_rows
 from Utils.PrintUtils import color_print, CODE_COLOR
 from Utils.PromptTemplateBuilder import PromptTemplateBuilder
 from langchain_community.chat_models import ChatOpenAI
@@ -43,10 +44,11 @@ class PythonCodeParser(BaseOutputParser):
 
 
 class xiaoyaAnalyser:
-    def __init__(self, prompt_path, info_path, interpreter, verbose=True):
+    def __init__(self, model, prompt_path, info_path, interpreter, verbose=True):
         self.prompt_code = PromptTemplateBuilder(prompt_path, "xiaoyaAgent.json").build()
         self.prompt_review = PromptTemplateBuilder(prompt_path, "code_reviewer.json")
         self.info = {}
+        self.model = model
         file_names = os.listdir(info_path)
         for file_name in file_names:
             if file_name.endswith(".txt"):
@@ -59,13 +61,9 @@ class xiaoyaAnalyser:
         self.code_history = []
         self.verbose = verbose
 
+
     def analyse(self, inputs):
         """分析一个结构化文件（比如CSV文件）的内容"""
-        llm = ChatOpenAI(
-            model="gpt-4",
-            temperature=0,
-            model_kwargs={"seed": 42}
-        )
         code_type = inputs['type']
 
         passParser = PydanticOutputParser(pydantic_object=PassAction)
@@ -77,7 +75,7 @@ class xiaoyaAnalyser:
             prompt_code_new = self.prompt_code.partial(code_description=self.info[code_type], code=code,
                                                        review_opinions=res.content, code_history=str(self.code_history)
                                                        )
-            chain_code = prompt_code_new | llm | PythonCodeParser()
+            chain_code = prompt_code_new | self.model | PythonCodeParser()
 
             if self.verbose:
                 color_print("\n#!/usr/bin/env python", CODE_COLOR, end="\n")
@@ -85,19 +83,21 @@ class xiaoyaAnalyser:
             for c in chain_code.stream({
                 "query": inputs['content'],
                 "filename": inputs['files'],
+                "filecontent": str([get_first_n_rows(file) for file in inputs['files']]),
             }):
                 if self.verbose:
                     color_print(c, CODE_COLOR, end="")
                 code += c
             prompt_review_new = self.prompt_review.build(output_parser=passParser)
-            chain_review = prompt_review_new | llm | passParser
+            chain_review = prompt_review_new | self.model | passParser
             res = chain_review.invoke({"query": inputs['content'], "code": code})
+            print('\n')
             print(res)
 
         if code:
             ans = self.interpreter.execute(code)
             self.code_history.append((code, ans))
-            return ans
+            return '生成的代码:\n'+ code+'\n'+'代码执行结果:\n'+ans
         else:
             return "没有找到可执行的 Python 代码"
 
@@ -108,9 +108,8 @@ class xiaoyaAnalyser:
             description="""通过程序脚本分析一个结构化文件（例如CSV文件）的内容。输入必须是以字典的形式进行指明,其中包含三个键： type、files和content。
             type:只能是(数据预处理、模型预测、数据分析、数据可视化、其他)其中一项
             files:文件的完整路径,可以是多个文件
-            content:尽可能完整的阐述当前分析阶段、具体分析方式和分析依据，阈值常量等。
+            content:尽可能完整的阐述当前分析阶段、具体分析方式和分析依据，阈值常量等。相应一键操作接口的可以直接指定，无需过于详细描述。
             如果输入信息不完整，你可以拒绝回答。"""
-
         )
 
 if __name__ == "__main__":

@@ -15,7 +15,8 @@
         "long_term_memory",
         "short_term_memory",
         "thought_instructions",
-        "format_instructions"
+        "format_instructions",
+        "csv_files"
     ],
     "template_path":"executor.txt"
 }

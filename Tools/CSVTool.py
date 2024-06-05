@@ -1,5 +1,5 @@
 import pandas as pd
-
+import os
 
 def get_column_names(
         filename: str
@@ -13,12 +13,22 @@ def get_column_names(
     return result
 
 
-def get_first_n_rows(
-        filename: str,
-        n: int = 3
-) -> str:
+def is_csv(filename):
+    """
+    判断文件类型是否为 CSV
+    """
+    _, ext = os.path.splitext(filename)
+    return ext.lower() == '.csv'
+
+
+def get_first_n_rows(filename: str, n: int = 3) -> str:
+    """
+    获取 CSV 文件的前 n 行，如果不是 CSV 文件则返回文件名
+    """
+    if not is_csv(filename):
+        return filename
     """获取 CSV 文件的前 n 行"""
-    result = get_column_names(filename) + "\n\n"
+    result = f"这是'{filename}'文件所有列名：{get_column_names(filename)}"+ "\n\n"
 
     df = pd.read_csv(filename)
 

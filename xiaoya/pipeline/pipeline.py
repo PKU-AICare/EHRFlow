@@ -150,7 +150,7 @@ class Pipeline:
         accelerator = 'gpu' if torch.cuda.is_available() else 'cpu'
         devices = [0] if accelerator == 'gpu' else 1
 
-        # train/val/test
+        # train/val/test.py
         pipeline = DlPipeline(self.config)
         trainer = L.Trainer(accelerator=accelerator, devices=devices, max_epochs=1, logger=False, num_sanity_val_steps=0)
         trainer.test(pipeline, datamodule=dm, ckpt_path=model_path)

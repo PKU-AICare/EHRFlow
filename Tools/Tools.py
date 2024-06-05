@@ -8,12 +8,12 @@ from .FileTools import list_files_in_directory
 from .WriterTool import write
 from .CSVTool import get_first_n_rows, get_column_names
 
-
-document_generation_tool = StructuredTool.from_function(
-    func=write,
-    name="GenerateDocument",
-    description="根据需求描述生成一篇正式文档"
-)
+#
+# document_generation_tool = StructuredTool.from_function(
+#     func=write,
+#     name="GenerateDocument",
+#     description="根据需求描述生成一篇正式文档"
+# )
 
 
 CSV_inspection_tool = StructuredTool.from_function(

@@ -1,7 +1,6 @@
 import openai
 import os
 
-from Tools import *
 from Tools.PythonTool import xiaoyaAnalyser
 
 from GraceAgent import (
@@ -20,7 +19,7 @@ warnings.filterwarnings("ignore")
 
 _ = load_dotenv(find_dotenv())
 openai.api_key = os.environ['OPENAI_API_KEY']
-
+openai.base_url = os.environ['OPENAI_API_BASE']
 
 def launch_agent(agent):
     human_icon = "\U0001F468"
@@ -39,19 +38,20 @@ def launch_agent(agent):
 
 def main():
     interpreter = Interpreter()
+    csv_files = ["./datasets/raw_events_data.csv", "./datasets/raw_labtest_data.csv", "./datasets/raw_target_data.csv"]
+    model = ChatOpenAI(model='gpt-4-1106-preview', temperature=0, model_kwargs={"seed": 42})
     tools = [
-        document_generation_tool,
         directory_inspection_tool,
         CSV_inspection_tool,
         finish_placeholder,
         xiaoyaAnalyser(
+            model = model,
             prompt_path="./prompts/Tools",
             info_path="./Tools/xiaoya_info",
-            interpreter=interpreter
+            interpreter=interpreter,
         ).as_tool()
     ]
-    model = ChatOpenAI(model='gpt-4-turbo-preview', temperature=0, model_kwargs={"seed": 42})
-    planner = GracePlanner(model, tools, stop=['<END_OF_PLAN>'])
+    planner = GracePlanner(model, tools, csv_files, stop=['<END_OF_PLAN>'])
     executor = GraceExecutor(
         llm=model,
         prompts_path="prompts/executor",
@@ -59,6 +59,7 @@ def main():
         work_dir='datasets',
         main_prompt_file='executor.json',
         final_prompt_file='final_step.json',
+        files=csv_files,
         max_thought_steps=10,
     )
     agent = GraceGPT(planner=planner, executor=executor)

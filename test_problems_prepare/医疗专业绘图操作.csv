@@ -1,0 +1,13 @@
+```csv
+相关数据分析概念,难度,问题内容,使用到的相关概念
+医疗专业绘图操作,易,"""请使用Python绘制raw_labtest_data.csv中'hemoglobin'值的直方图，以观察其分布情况。""",数据集分布的直方图绘制
+医疗专业绘图操作,易,"""请绘制raw_events_data.csv中'Sex'字段的条形图，展示不同性别的患者数量。""",特征重要性的条形图展示
+医疗专业绘图操作,中,"""请结合raw_labtest_data.csv和raw_target_data.csv，绘制患者'hemoglobin'值与LOS之间的散点图，探索二者之间的关系。""",患者风险曲线的绘制
+医疗专业绘图操作,中,"""请对raw_labtest_data.csv中的所有检测项(Name字段)的平均值进行计算，并绘制条形图展示每个检测项的平均值。""",特征重要性的条形图展示
+医疗专业绘图操作,困难,"""请将raw_events_data.csv和raw_labtest_data.csv按PatientID和RecordTime合并，并使用PCA方法对合并后的数据进行降维，最后绘制降维后的数据分布图。""",患者嵌入的降维展示
+医疗专业绘图操作,困难,"""请使用raw_target_data.csv中的Outcome字段，绘制不同Outcome值的患者在raw_labtest_data.csv中'hemoglobin'值的分布直方图，以比较不同Outcome下'hemoglobin'值的分布差异。""",数据集分布的直方图绘制
+医疗专业绘图操作,易,"""请绘制raw_target_data.csv中'LOS'字段的直方图，以观察住院天数的分布情况。""",数据集分布的直方图绘制
+医疗专业绘图操作,中,"""请绘制raw_labtest_data.csv中'Value'字段随时间变化的趋势图，选择任一PatientID进行展示。""",患者风险曲线的绘制
+医疗专业绘图操作,困难,"""请结合raw_labtest_data.csv和raw_target_data.csv，使用逻辑回归模型预测Outcome，并绘制ROC曲线评估模型性能。""",患者风险曲线的绘制
+医疗专业绘图操作,困难,"""请对raw_events_data.csv、raw_labtest_data.csv和raw_target_data.csv进行合并，并计算每个患者的所有检测项(Name字段)的平均值，然后绘制这些平均值的分布直方图。""",数据集分布的直方图绘制
+```

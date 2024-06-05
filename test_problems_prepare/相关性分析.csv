@@ -1,0 +1,13 @@
+```csv
+相关数据分析概念,难度,问题内容,使用到的相关概念
+相关性分析,易,"""请计算raw_events_data.csv中的'Value'列与raw_target_data.csv中的'LOS'列之间的相关系数。""",相关性分析
+相关性分析,易,"""请找出raw_labtest_data.csv中哪个检测项目（'Name'列）的'Value'与raw_target_data.csv中的'Outcome'之间相关性最强。""",相关性分析
+相关性分析,中,"""请分析raw_events_data.csv中的'Sex'（性别）与raw_target_data.csv中的'Outcome'之间是否存在相关性。""",相关性分析
+相关性分析,中,"""请探究raw_labtest_data.csv中的'hemoglobin'（血红蛋白）值与raw_target_data.csv中的'LOS'（住院时长）之间的相关性。""",相关性分析
+相关性分析,中,"""请比较raw_events_data.csv与raw_labtest_data.csv中，哪个数据集中的'Value'列与raw_target_data.csv中的'LOS'之间的相关性更强。""",相关性分析
+相关性分析,难,"""请分析raw_labtest_data.csv中所有检测项目的'Value'与raw_target_data.csv中的'Outcome'之间的相关性，并找出相关性最强的三个检测项目。""",相关性分析
+相关性分析,难,"""请基于raw_events_data.csv与raw_labtest_data.csv中的数据，构建一个模型预测raw_target_data.csv中的'LOS'，并评估模型中各变量的相关性。""",相关性分析
+相关性分析,难,"""请探究raw_labtest_data.csv中的'Value'在不同'Name'（检测项目）下，与raw_target_data.csv中'Outcome'的相关性是否存在显著差异。""",相关性分析
+相关性分析,难,"""请分析raw_events_data.csv中的'RecordTime'与raw_target_data.csv中的'LOS'之间是否存在时间序列上的相关性。""",相关性分析
+相关性分析,难,"""请探究raw_labtest_data.csv中，不同时间点（'RecordTime'）的'Value'变化对raw_target_data.csv中'Outcome'的影响。""",相关性分析
+```

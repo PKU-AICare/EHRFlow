@@ -4,11 +4,16 @@ from langchain_core.language_models import BaseChatModel
 from langchain_core.output_parsers import StrOutputParser
 from langchain.output_parsers import PydanticOutputParser, OutputFixingParser
 from langchain.memory import ConversationTokenBufferMemory, VectorStoreRetrieverMemory
+from langchain.callbacks.manager import (
+    AsyncCallbackManagerForChainRun,
+    CallbackManagerForChainRun,
+)
 from pydantic import ValidationError
 
 from GraceAgent.Action import Action
 from Utils.PromptTemplateBuilder import PromptTemplateBuilder
 from Utils.PrintUtils import *
+from Tools.CSVTool import get_first_n_rows
 
 
 def _format_short_term_memory(memory):
@@ -31,6 +36,7 @@ class GraceExecutor:
             llm: BaseChatModel,
             prompts_path: str,
             tools,
+            files,
             work_dir: str = "./datasets",
             main_prompt_file: str = "executor.json",
             final_prompt_file: str = "final_step.json",
@@ -42,6 +48,7 @@ class GraceExecutor:
         self.tools = tools
         self.work_dir = work_dir
         self.max_thought_steps = max_thought_steps
+        self.csv_files = files
 
         self.output_parser = PydanticOutputParser(pydantic_object=Action)
         self.robust_parser = OutputFixingParser.from_llm(parser=self.output_parser, llm=self.llm)
@@ -49,9 +56,13 @@ class GraceExecutor:
         self.main_prompt_file = main_prompt_file
         self.final_prompt_file = final_prompt_file
 
-    def run(self, inputs, verbose=True) -> str:
+    def run(self,
+            inputs,
+            run_manager=None,
+            verbose=True) -> str:
         thought_step_count = 0
 
+        run_manager = None
         prompt_template = PromptTemplateBuilder(
             self.prompt_path,
             self.main_prompt_file
@@ -62,6 +73,7 @@ class GraceExecutor:
             history_info=inputs["previous_steps"],
             current_step=inputs["current_step"],
             work_dir=self.work_dir,
+            csv_files=str([get_first_n_rows(csv_file) for csv_file in self.csv_files])
         )
         short_term_memory = ConversationTokenBufferMemory(
             llm=self.llm,
@@ -78,15 +90,21 @@ class GraceExecutor:
         while thought_step_count < self.max_thought_steps:
             if verbose:
                 color_print(f">>>>Round :{thought_step_count}<<<<", ROUND_COLOR)
+            if run_manager:
+                run_manager.on_llm_new_token(f">>>>Round :{thought_step_count}<<<<", verbose=verbose)
+
             action, response = self._step(
                 chain,
                 short_term_memory=short_term_memory,
+                run_manager=run_manager,
                 verbose=verbose
             )
             print(action.name)
             if action.name == "FINISH":
                 if verbose:
                     color_print(f"\n----\nFINISH", OBSERVATION_COLOR)
+                if run_manager:
+                    run_manager.on_llm_new_token("\n----\nFINISH", verbose=verbose)
                 reply = self._final_step(short_term_memory, inputs["current_step"], inputs["previous_steps"])
                 break
 
@@ -94,11 +112,13 @@ class GraceExecutor:
 
             if verbose:
                 color_print(f"\n----\n结果{observation}", OBSERVATION_COLOR)
+            if run_manager:
+                run_manager.on_llm_new_token(observation, verbose=verbose)
 
             # 保存短时记忆
             short_term_memory.save_context(
-                {"input": response + action.name},
-                {"output": "返回结果：\n" + observation}
+                {"output": ' 上一轮的思考过程、工具调用和结果'},
+                {"output": "思考过程：" + response + '\n' + "选择工具：" + action.name + '\n' +"工具执行结果：\n" + observation}
             )
             thought_step_count += 1
         if not reply:
@@ -106,7 +126,7 @@ class GraceExecutor:
 
         return reply
 
-    def _step(self, reason_chain, short_term_memory, verbose=False):
+    def _step(self, reason_chain, short_term_memory, run_manager=None, verbose=False):
         """执行一步步的思考"""
         response = ""
         for s in reason_chain.stream({
@@ -115,7 +135,8 @@ class GraceExecutor:
             if verbose:
                 color_print(s, THOUGHT_COLOR, end="")
             response += s
-
+        if run_manager:
+            run_manager.on_llm_new_token(response, verbose=verbose)
         action = self.robust_parser.parse(response)
         return action, response
 
@@ -141,6 +162,7 @@ class GraceExecutor:
                 f"Error:找不到工具或指令 '{action.name}'."
                 f"请从提供的工具/指令列表中选择，请确保按对顶格式输出。"
             )
+
         else:
             try:
                 # 执行工具

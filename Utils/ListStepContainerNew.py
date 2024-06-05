@@ -16,5 +16,5 @@ class ListStepContainer(BaseStepContainer):
     def get_steps(self) -> List[Tuple[Step, StepResponse]]:
         return self.steps
 
-    def get_final_response(self) -> str:
-        return self.steps[-1][1]['output']
+    def get_final_response(self):
+        return self.steps[-1][1]

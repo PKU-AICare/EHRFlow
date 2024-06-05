@@ -8,7 +8,8 @@
         "previous_steps",
         "plan_thought_instructions",
         "plan_instructions",
-        "med_knowledge"
+        "med_knowledge",
+        "csv_files"
     ],
     "template_path":"planner.txt"
 }

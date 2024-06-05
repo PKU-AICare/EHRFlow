@@ -208,7 +208,7 @@ class DataHandler:
             seed: int = 42
         ) -> None:
         """
-        Split the dataset into train/val/test sets.
+        Split the dataset into train/val/test.py sets.
 
         Args:
             train_size: int.
@@ -216,7 +216,7 @@ class DataHandler:
             val_size: int.
                 val set percentage.
             test_size: int.
-                test set percentage.
+                test.py set percentage.
             seed: int.
                 random seed.
         """
@@ -226,7 +226,7 @@ class DataHandler:
         grouped = self.merged_df.groupby('PatientID')
         patients = np.array(list(grouped.groups.keys()))
         
-        # Get the train_val/test patient IDs
+        # Get the train_val/test.py patient IDs
         patients_outcome = np.array([grouped.get_group(patient_id)['Outcome'].iloc[0] for patient_id in patients])
         train_val_patients, test_patients = train_test_split(patients, test_size=test_size/(train_size+val_size+test_size), random_state=seed, stratify=patients_outcome)
 
@@ -234,7 +234,7 @@ class DataHandler:
         train_val_patients_outcome = np.array([grouped.get_group(patient_id)['Outcome'].iloc[0] for patient_id in train_val_patients])
         train_patients, val_patients = train_test_split(train_val_patients, test_size=val_size/(train_size+val_size), random_state=seed, stratify=train_val_patients_outcome)
 
-        #  Create train, val, test, [traincal, calib] dataframes for the current fold
+        #  Create train, val, test.py, [traincal, calib] dataframes for the current fold
         self.train_raw_df = self.merged_df[self.merged_df['PatientID'].isin(train_patients)]
         self.val_raw_df = self.merged_df[self.merged_df['PatientID'].isin(val_patients)]
         self.test_raw_df = self.merged_df[self.merged_df['PatientID'].isin(test_patients)]
@@ -259,7 +259,7 @@ class DataHandler:
                 features to be normalized.
         """
 
-        # Calculate the mean and std of the train set (include age, lab test features, and LOS) on the data in 5% to 95% quantile range
+        # Calculate the mean and std of the train set (include age, lab test.py features, and LOS) on the data in 5% to 95% quantile range
         train_after_zscore, val_after_zscore, test_after_zscore, self.default_fill, self.los_info, self.train_mean, self.train_std = \
             normalize_dataframe(self.train_raw_df, self.val_raw_df, self.test_raw_df, normalize_features)
         
@@ -279,7 +279,7 @@ class DataHandler:
             demographic_features: List[str].
                 demographic features.
             labtest_features: List[str].
-                lab test features.
+                lab test.py features.
         """
         
         # Forward Imputation after grouped by PatientID
@@ -302,7 +302,7 @@ class DataHandler:
             val_size: int.
                 val set percentage.
             test_size: int.
-                test set percentage.
+                test.py set percentage.
             seed: int.
                 random seed.
         """

@@ -2,6 +2,7 @@
     "_type": "prompt",
     "input_variables": [
       "filename",
+      "filecontent",
       "columns",
       "code_description",
       "inspections",
@@ -9,7 +10,6 @@
       "code",
       "review_opinions",
       "code_history"
-
     ],
     "template_path": "xiaoyaAgent.txt"
 }
