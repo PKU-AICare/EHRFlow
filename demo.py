@@ -24,7 +24,7 @@ warnings.filterwarnings("ignore")
 
 
 def main():
-    st.set_page_config(page_title="EHRFlow:您的专属医疗结构化数据分析智能助理", page_icon="🤖", layout="wide")
+    st.set_page_config(page_title="EHRFlow: EHR Analysis Assistant", page_icon="🤖", layout="wide")
     st.markdown(
         """
         <div style='text-align: center;'>
@@ -36,7 +36,7 @@ def main():
     st.markdown(
         """
         <div style='text-align: center;'>
-            <h4>🤖您的专属医疗结构化数据分析智能助理🥰</h4>
+            <h4>🤖 Your intelligent assistant for EHR data analysis 🥰</h4>
         </div>
         """,
         unsafe_allow_html=True,
@@ -44,22 +44,19 @@ def main():
 
     with st.sidebar:
         st.markdown("<h1 style='text-align:center;font-family:Georgia'>⚙️ EHRFlow </h1>", unsafe_allow_html=True)
-        st.markdown("""一个稳定、可控、可扩展的自助式EHR数据分析平台。该系统旨在深入解决医生在实际工作中针对电子健康记录（EHR）的数据问答和数据分析需求，
-                    融合了大语言模型Agent框架和本地工具类，以增强医生与数据分析工具的交互效率和准确性，从而推动医疗决策的智能化和个性化医疗服务的发展。\n""")
+        st.markdown("""An expandable, user-friendly, self-service EHR data analysis platform.\n""")
 
         st.markdown("-------")
         st.markdown("<h1 style='text-align:center;font-family:Georgia'>🌟Features</h1>", unsafe_allow_html=True)
+        st.markdown(" - 🤑 Self-service Analysis - Complete control over EHR data content, mastering EHR data.")
         st.markdown(
-            " - 🧾 自助式分析 - 大语言模型深度赋能，智能驱动自助式分析。")
-        st.markdown(" - 🤑 数据问答- EHR 数据内容高度掌控，玩转 EHR 数据")
-        st.markdown(
-            " - 🧾 智能决策 - 深入分析和挖掘医疗数据，高效完成医疗智能决策")
+            " - 🧾 Intelligent Decision-making - In-depth analysis and mining of medical data, efficiently achieving intelligent medical decision-making.")
         st.markdown("-------")
         st.markdown("<h1 style='text-align:center;font-family:Georgia'>🧾 How to use?</h1>",
                     unsafe_allow_html=True)
         st.markdown(
             "1. Enter your OpenAI API key below🔑")
-        st.markdown("2. Upload Your EMR(csv) files📄")
+        st.markdown("2. Upload Your EHR (CSV) files📄")
         st.markdown(
             "3. Ask a question about your data💬")
         if os.path.exists(".env"):
@@ -92,8 +89,7 @@ def main():
                 f.write(uploaded_file.getvalue())
 
     print([uploaded_file.name for uploaded_file in uploaded_files])
-    _init_mes = ("您好，我是小雅，一个擅长处理医疗结构化数据的智能助理。🥳在提交完EHR数据之后，您可以向我尽情提出关于EHR"
-                 "医疗数据的问题或者处理要求，我会根据您的需求帮您处理数据，返回相应结果辅助您更好地进行医疗数据分析。现在有什么可以帮您的吗？")
+    _init_mes = ("Hello, I am EHRFlow, an intelligent assistant specializing in handling structured medical data. 🥳 After submitting your EHR data, you can feel free to ask me any questions or processing requests related to EHR medical data. I will process the data according to your needs and return corresponding results to assist you in better analyzing medical data. How can I assist you today?")
 
     if "messages" not in st.session_state.keys():
         st.session_state.messages = [{"role": "assistant", "content": _init_mes}]
@@ -115,7 +111,10 @@ def main():
 
     st_callback = StreamlitCallbackHandler(st.container())
     interpreter = Interpreter()
-    model = ChatOpenAI(model='gpt-4-turbo-preview', temperature=0, model_kwargs={"seed": 42})
+    model = ChatOpenAI(model='gpt-4o-2024-08-06',
+                       openai_api_base="",
+                       openai_api_key="",
+                       temperature=0)
     tools = [
         directory_inspection_tool,
         CSV_inspection_tool,
